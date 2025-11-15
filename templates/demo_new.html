@@ -1,0 +1,3228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>QuantAgent - Multi-Agent Trading System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --etrade-purple: #241056;
+            --etrade-purple-light: #5627D8;
+            --etrade-purple-dark: #1A0B3A;
+            --etrade-purple-bg: #F8F5FF;
+            --white: #ffffff;
+            --gray-50: #F9FAFB;
+            --gray-100: #F3F4F6;
+            --gray-200: #E5E7EB;
+            --gray-300: #D1D5DB;
+            --gray-400: #9CA3AF;
+            --gray-500: #6B7280;
+            --gray-600: #4B5563;
+            --gray-700: #374151;
+            --gray-800: #1F2937;
+            --gray-900: #111827;
+        }
+
+        * {
+            box-sizing: border-box;
+            border-width: 0;
+            border-style: solid;
+            border-color: #e5e7eb;
+        }
+
+        html {
+            font-size: 14px; /* 基础字体大小 */
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--etrade-purple-bg);
+            color: var(--gray-800);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden; /* 防止水平滚动 */
+        }
+
+        /* 响应式字体大小 */
+        .responsive-heading {
+            font-size: clamp(1.5rem, 4vw, 3rem);
+        }
+
+        .responsive-subheading {
+            font-size: clamp(1rem, 2vw, 1.5rem);
+        }
+
+        /* 响应式容器 */
+        .responsive-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+
+        /* 响应式图片 */
+        .responsive-img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Header */
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--gray-200);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo {
+            width: 2.5rem;
+            height: 2.5rem;
+            object-fit: contain;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--etrade-purple);
+            white-space: nowrap;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, var(--etrade-purple) 0%, var(--etrade-purple-light) 100%);
+            position: relative;
+            overflow: hidden;
+            padding: 2rem 0;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="white" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .hero-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero-logo {
+            width: 5rem;
+            height: 5rem;
+            object-fit: contain;
+            background: transparent;
+            box-shadow: none;
+            border: none;
+            border-radius: 0;
+        }
+
+        .hero-title {
+            color: white;
+            font-weight: 700;
+            line-height: 1.2;
+            margin: 0;
+        }
+
+        .hero-subtitle {
+            color: white;
+            font-size: clamp(1rem, 2vw, 1.1rem);
+            margin: 1rem 0;
+        }
+
+        /* Form Styles */
+        .form-container {
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(36, 16, 86, 0.25);
+            margin: 2rem auto;
+            max-width: 1200px;
+            overflow: hidden;
+            width: calc(100% - 2rem);
+        }
+
+        .form-section {
+            padding: 2rem;
+        }
+
+        .form-section h3 {
+            color: var(--etrade-purple);
+            font-weight: 600;
+            margin-bottom: 2rem;
+            font-size: 1.5rem;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--white);
+            width: 100%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--etrade-purple);
+            box-shadow: 0 0 0 3px rgba(36, 16, 86, 0.1), 0 4px 12px rgba(36, 16, 86, 0.1);
+            outline: none;
+            transform: translateY(-1px);
+        }
+
+        .form-control:hover, .form-select:hover {
+            border-color: var(--gray-300);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Glow or Gradient Border on Active Fields */
+        input[type="time"]:focus, input[type="date"]:focus {
+            border: 1px solid #9b6bff;
+            box-shadow: 0 0 0 2px rgba(155, 107, 255, 0.2);
+            transition: all 0.2s ease-in-out;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .btn-primary {
+            background: var(--etrade-purple-light);
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 2rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--white);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(86, 39, 216, 0.3);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(86, 39, 216, 0.4);
+            background: var(--etrade-purple);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Enhanced Button Styles */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-outline-primary {
+            background: transparent;
+            color: var(--etrade-purple);
+            border: 2px solid var(--etrade-purple);
+            box-shadow: 0 2px 8px rgba(36, 16, 86, 0.1);
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--etrade-purple);
+            color: var(--white);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(36, 16, 86, 0.3);
+        }
+
+        .btn-outline-primary:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 12px rgba(36, 16, 86, 0.2);
+        }
+
+        .btn-outline-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 2px 8px rgba(36, 16, 86, 0.1);
+        }
+
+        .btn-outline-primary:disabled:hover {
+            background: transparent;
+            color: var(--etrade-purple);
+            transform: none;
+            box-shadow: 0 2px 8px rgba(36, 16, 86, 0.1);
+        }
+
+        .fa-spin {
+            animation: fa-spin 2s infinite linear;
+        }
+
+        @keyframes fa-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert {
+            border-radius: 12px;
+            border: none;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-info {
+            background: linear-gradient(135deg, rgba(36, 16, 86, 0.1) 0%, rgba(86, 39, 216, 0.1) 100%);
+            border-left: 4px solid var(--etrade-purple);
+            color: var(--gray-700);
+        }
+
+        .alert-warning {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(251, 191, 36, 0.1) 100%);
+            border-left: 4px solid #F59E0B;
+            color: #92400E;
+        }
+
+        .alert-danger {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(248, 113, 113, 0.1) 100%);
+            border-left: 4px solid #EF4444;
+            color: #991B1B;
+        }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-left: -0.75rem;
+            margin-right: -0.75rem;
+        }
+
+        .col-md-6, .col-md-4, .col-md-12 {
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+        }
+
+        .mb-4 { margin-bottom: 1.5rem; }
+        .mb-3 { margin-bottom: 1rem; }
+        .mt-2 { margin-top: 0.5rem; }
+        .mt-3 { margin-top: 1rem; }
+        .text-center { text-align: center; }
+        .fw-bold { font-weight: 600; }
+        .text-muted { color: var(--gray-500) !important; }
+        .d-flex { display: flex; }
+        .align-items-center { align-items: center; }
+        .justify-content-center { justify-content: center; }
+        .w-100 { width: 100%; }
+        .h-100 { height: 100%; }
+        .visually-hidden {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            padding: 0 !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+            border: 0 !important;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--etrade-purple);
+            border-color: var(--etrade-purple);
+        }
+
+        .form-check-input:focus {
+            border-color: var(--etrade-purple);
+            box-shadow: 0 0 0 0.25rem rgba(36, 16, 86, 0.25);
+        }
+
+        .form-check {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-check-input {
+            margin-right: 0.5rem;
+        }
+
+        .form-check-label {
+            margin-bottom: 0;
+        }
+
+        .me-3 { margin-right: 0.75rem; }
+        .mt-1 { margin-top: 0.25rem; }
+
+        /* Asset Button Grid Styles */
+        .asset-button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .asset-btn {
+            background: var(--gray-100);
+            border: 2px solid var(--gray-200);
+            border-radius: 16px;
+            padding: 1rem 0.75rem;
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--gray-700);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            min-height: 80px;
+            justify-content: center;
+        }
+
+        .asset-btn:hover {
+            background: var(--gray-200);
+            border-color: var(--etrade-purple-light);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(86, 39, 216, 0.15);
+        }
+
+        .asset-btn.active {
+            background: var(--etrade-purple-light);
+            border-color: var(--etrade-purple-light);
+            color: var(--white);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(86, 39, 216, 0.3);
+        }
+
+        .asset-btn i {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .custom-asset-btn {
+            background: linear-gradient(135deg, var(--gray-100) 0%, var(--gray-200) 100%);
+            border: 2px dashed var(--gray-400);
+        }
+
+        .custom-asset-btn:hover {
+            background: linear-gradient(135deg, var(--etrade-purple-light) 0%, var(--etrade-purple) 100%);
+            border-color: var(--etrade-purple-light);
+            color: var(--white);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 0.75rem;
+            align-items: stretch;
+        }
+
+        .input-group .form-control {
+            flex: 1;
+            border-radius: 12px;
+            border: 2px solid var(--gray-200);
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-group .form-control:focus {
+            border-color: var(--etrade-purple);
+            box-shadow: 0 0 0 3px rgba(36, 16, 86, 0.1);
+            outline: none;
+        }
+
+        .input-group .btn {
+            border-radius: 12px;
+            white-space: nowrap;
+            min-width: 100px;
+        }
+
+        /* Panel Layout Styles */
+        .panel-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .panel {
+            background: var(--white);
+            border: 2px solid var(--gray-200);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .panel:hover {
+            border-color: var(--etrade-purple-light);
+            box-shadow: 0 8px 24px rgba(86, 39, 216, 0.1);
+        }
+
+        .panel-title {
+            color: var(--etrade-purple);
+            font-weight: 600;
+            font-size: 1.4rem;
+            margin: 0.5rem 0 1.5rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--gray-100);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .panel-title i {
+            font-size: 1.5rem;
+            color: var(--etrade-purple-light);
+            background: linear-gradient(135deg, var(--etrade-purple-light) 0%, var(--etrade-purple) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 2px 4px rgba(86, 39, 216, 0.2));
+        }
+
+        .action-panel .panel-title {
+            color: var(--white);
+            border-bottom-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .action-panel .panel-title i {
+            color: var(--white);
+            background: linear-gradient(135deg, var(--white) 0%, rgba(255, 255, 255, 0.8) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 2px 4px rgba(255, 255, 255, 0.3));
+        }
+
+        /* Modern Hero Button */
+        .hero-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            background: linear-gradient(135deg, var(--etrade-purple-light) 0%, var(--etrade-purple) 100%);
+            color: var(--white);
+            padding: 1.25rem 2.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 25px rgba(86, 39, 216, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .hero-btn:hover::before {
+            left: 100%;
+        }
+
+        .hero-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(86, 39, 216, 0.4);
+            background: linear-gradient(135deg, var(--etrade-purple) 0%, var(--etrade-purple-light) 100%);
+        }
+
+        .hero-btn:active {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(86, 39, 216, 0.3);
+        }
+
+        .hero-btn-text {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-btn-icon {
+            position: relative;
+            z-index: 1;
+            transition: transform 0.3s ease;
+        }
+
+        .hero-btn:hover .hero-btn-icon {
+            transform: translateX(4px);
+        }
+
+        /* Modern Header Button */
+        .header-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--white);
+            color: var(--etrade-purple);
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid transparent;
+        }
+
+        .header-btn:hover {
+            background: var(--etrade-purple);
+            color: var(--white);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(36, 16, 86, 0.2);
+            border-color: var(--etrade-purple);
+        }
+
+        .header-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-btn-text {
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-btn-icon {
+            position: relative;
+            z-index: 1;
+            transition: transform 0.3s ease;
+        }
+
+        .header-btn:hover .header-btn-icon {
+            transform: translateX(3px);
+        }
+
+        .action-panel {
+            grid-column: 1 / -1;
+            background: var(--white);
+            border: 2px solid var(--gray-200);
+            color: var(--gray-800);
+        }
+
+        .action-panel .panel-title {
+            color: var(--white);
+            border-bottom-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Security Panel Styles */
+        .security-panel {
+            background: #FEFBF3;
+            border: 2px solid #E5E7EB;
+            border-radius: 16px;
+        }
+
+        .security-panel .panel-title {
+            color: #374151;
+            border-bottom: 2px solid #E5E7EB;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+        }
+
+        .security-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .security-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+            background: #FFFFFF;
+            border-radius: 12px;
+            border: 1px solid #F3F4F6;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .security-icon {
+            color: #F59E0B;
+            font-size: 1.3rem;
+            margin-top: 0.1rem;
+            flex-shrink: 0;
+            background: #FEF3C7;
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
+
+        .security-content {
+            color: #374151;
+            line-height: 1.6;
+        }
+
+        .security-content strong {
+            color: #1F2937;
+            font-size: 1.1rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .security-content p {
+            margin: 0;
+            color: #6B7280;
+        }
+
+        /* Title Styles */
+        .title-main {
+            display: inline;
+            font-weight: 700;
+        }
+
+        .title-highlight {
+            display: inline;
+            font-weight: 700;
+            color: white;
+            position: relative;
+        }
+
+        .title-highlight::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--etrade-purple-light);
+            border-radius: 1px;
+        }
+
+        /* Timeframe Selector Styles */
+        .timeframe-selector {
+            display: flex;
+            background: var(--gray-100);
+            border-radius: 12px;
+            padding: 4px;
+            gap: 2px;
+            border: 2px solid var(--gray-200);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .timeframe-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--gray-600);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            min-width: 0;
+            text-align: center;
+        }
+
+        .timeframe-btn:hover {
+            background: rgba(86, 39, 216, 0.1);
+            color: var(--etrade-purple);
+            transform: translateY(-1px);
+        }
+
+        .timeframe-btn.active {
+            background: var(--etrade-purple-light);
+            color: var(--white);
+            box-shadow: 0 4px 12px rgba(86, 39, 216, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .timeframe-btn.active::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(135deg, var(--etrade-purple-light), var(--etrade-purple));
+            border-radius: 10px;
+            z-index: -1;
+            opacity: 0.8;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 5px rgba(86, 39, 216, 0.5);
+            }
+            to {
+                box-shadow: 0 0 20px rgba(86, 39, 216, 0.8), 0 0 30px rgba(86, 39, 216, 0.4);
+            }
+        }
+
+        /* Banner Image Styles */
+        .hero-section img {
+            max-width: 100%;
+            height: auto;
+            object-fit: cover;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 历史记录模态框样式 */
+        .modal-content {
+            border-radius: 16px !important;
+            border: 2px solid var(--gray-200) !important;
+            box-shadow: 0 25px 50px -12px rgba(36, 16, 86, 0.25);
+        }
+
+        .modal-header {
+            background: var(--etrade-purple) !important;
+            color: white !important;
+            border-radius: 14px 14px 0 0 !important;
+            border-bottom: none !important;
+            padding: 1.5rem !important;
+        }
+
+        .modal-title {
+            font-size: 1.5rem !important;
+            font-weight: 600 !important;
+        }
+
+        .modal-body {
+            padding: 2rem !important;
+        }
+
+        .modal-footer {
+            padding: 1.5rem 2rem !important;
+            border-top: 1px solid var(--gray-200) !important;
+        }
+
+        /* 表格样式 */
+        .table {
+            margin-bottom: 0 !important;
+        }
+
+        .table th {
+            font-weight: 600 !important;
+            color: var(--etrade-purple) !important;
+            border-bottom: 2px solid var(--gray-200) !important;
+            padding: 1rem !important;
+        }
+
+        .table td {
+            padding: 1rem !important;
+            vertical-align: middle !important;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: var(--etrade-purple-bg) !important;
+        }
+
+        /* 响应式设计 - 移动设备 */
+        @media (max-width: 768px) {
+            html {
+                font-size: 12px; /* 在移动设备上减小基础字体大小 */
+            }
+
+            .header-container {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.5rem;
+            }
+
+            .logo-container {
+                justify-content: center;
+            }
+
+            .header-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .hero-logo-container {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .hero-logo {
+                width: 4rem;
+                height: 4rem;
+            }
+
+            .form-container {
+                margin: 1rem;
+                border-radius: 16px;
+            }
+
+            .form-section {
+                padding: 1.5rem 1rem;
+            }
+
+            .panel-group {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .panel {
+                padding: 1rem;
+            }
+
+            .col-md-6, .col-md-4, .col-md-12 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+
+            /* Mobile asset button grid */
+            .asset-button-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.5rem;
+            }
+
+            .asset-btn {
+                padding: 0.75rem 0.5rem;
+                font-size: 0.9rem;
+                min-height: 70px;
+            }
+
+            .asset-btn i {
+                font-size: 1.2rem;
+            }
+
+            /* Mobile timeframe selector */
+            .timeframe-selector {
+                overflow-x: auto;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+            }
+
+            .timeframe-selector::-webkit-scrollbar {
+                display: none;
+            }
+
+            .timeframe-btn {
+                flex-shrink: 0;
+                min-width: 60px;
+                padding: 10px 12px;
+                font-size: 0.8rem;
+            }
+
+            /* Mobile banner adjustments */
+            .hero-section img {
+                max-width: 80%;
+                margin: 2rem auto;
+                display: block;
+            }
+
+            /* 响应式调整 */
+            .modal-dialog {
+                margin: 0.5rem !important;
+                max-width: none !important;
+            }
+
+            .modal-body {
+                padding: 1rem !important;
+            }
+
+            .table-responsive {
+                overflow-x: auto !important;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .input-group .btn {
+                min-width: auto;
+                width: 100%;
+            }
+        }
+
+        /* 响应式设计 - 小屏幕手机 */
+        @media (max-width: 480px) {
+            html {
+                font-size: 11px;
+            }
+
+            .hero-btn {
+                padding: 1rem 2rem;
+                font-size: 1rem;
+            }
+
+            .form-section h3 {
+                font-size: 1.3rem;
+            }
+
+            .panel-title {
+                font-size: 1.2rem;
+            }
+
+            .asset-button-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .security-item {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .security-icon {
+                align-self: center;
+            }
+        }
+
+        /* 响应式设计 - 平板设备 */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .panel-group {
+                gap: 1.5rem;
+            }
+
+            .asset-button-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .col-md-6 {
+                flex: 0 0 50%;
+                max-width: 50%;
+            }
+
+            .col-md-4 {
+                flex: 0 0 33.333333%;
+                max-width: 33.333333%;
+            }
+        }
+
+        /* 响应式设计 - 大屏幕设备 */
+        @media (min-width: 1200px) {
+            .responsive-container {
+                max-width: 1200px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Page wrapper -->
+    <div class="min-h-screen overflow-hidden">
+
+        <!-- Header -->
+        <header>
+            <div class="responsive-container">
+                <div class="header-container">
+                    <!-- Logo -->
+                    <div class="logo-container">
+                        <img src="assets/darklogo.png" alt="QuantAgent Logo" class="logo">
+                        <span class="logo-text">QuantAgent</span>
+                    </div>
+
+                    <!-- Navigation Buttons -->
+                    <div class="d-flex">
+                        <!-- 历史记录按钮 -->
+                        <button id="historyButton" class="header-btn" onclick="showHistoryModal()">
+                            <i class="fas fa-history"></i>
+                            <span>历史记录</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page content -->
+        <main class="grow">
+
+            <!-- Hero Section -->
+            <section class="hero-section">
+                <div class="responsive-container">
+                    <div class="hero-content">
+                        <div class="hero-logo-container">
+                            <img src="assets/darklogo.png" alt="QuantAgent Logo" class="hero-logo">
+                            <h1 class="hero-title responsive-heading">QuantAgent:</h1>
+                        </div>
+                        <div>
+                            <span class="title-highlight responsive-heading">Multi-Agent Trading System</span>
+                        </div>
+                        <p class="hero-subtitle">Advanced multi-agent system combining technical indicators, pattern recognition, and trend analysis for comprehensive market insights.</p>
+
+                        <!-- Buttons -->
+                        <div>
+                            <a class="hero-btn" href="#analysis">
+                                <span class="hero-btn-text">Start Analysis</span>
+                                <span class="hero-btn-icon">
+                                    <i class="fas fa-arrow-right"></i>
+                                </span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Analysis Form Section -->
+            <section id="analysis" class="py-5 py-md-4">
+                <div class="form-container">
+                    <!-- Analysis Form -->
+                    <div class="form-section">
+                        <h3>
+                            <i class="fas fa-cog"></i> Analysis Configuration
+                        </h3>
+
+                        <!-- Panel 1: Data Selection -->
+                        <div class="panel-group">
+                            <div class="panel">
+                                <h4 class="panel-title">
+                                    <i class="fas fa-database"></i> Data Selection
+                                </h4>
+
+                                <!-- Asset Selection -->
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="fas fa-coins"></i> Asset
+                                    </label>
+                                    <div class="asset-button-grid" id="assetButtonGrid">
+                                        <button type="button" class="asset-btn" data-asset="BTC" onclick="selectAsset(this, 'BTC')">
+                                            <i class="fas fa-bitcoin"></i> BTC
+                                        </button>
+                                        <button type="button" class="asset-btn" data-asset="ETH" onclick="selectAsset(this, 'ETH')">
+                                            <i class="fab fa-ethereum"></i> ETH
+                                        </button>
+                                        <button type="button" class="asset-btn" data-asset="TSLA" onclick="selectAsset(this, 'TSLA')">
+                                            <i class="fas fa-car"></i> TSLA
+                                        </button>
+                                        <button type="button" class="asset-btn custom-asset-btn" id="customAssetBtn" onclick="showCustomAssetInput()">
+                                            <i class="fas fa-plus"></i> Custom
+                                        </button>
+                                    </div>
+
+                                    <!-- Custom Asset Input -->
+                                    <div id="customAssetDiv" class="mt-3" style="display: none;">
+                                        <div class="alert alert-info">
+                                            <h6><i class="fas fa-plus-circle"></i> Custom Asset Symbol</h6>
+                                            <p class="mb-2"><strong>💡 Examples:</strong> NQ (Nasdaq-100 Futures), ZN (10-Year Treasury), etc.</p>
+                                            <p class="mb-0"><strong>📝 Format:</strong> Enter the Yahoo Finance symbol for your asset</p>
+                                        </div>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="customAssetInput" placeholder="Enter symbol (e.g., NQ=F, ZN=F, ^VIX)">
+                                            <button class="btn btn-outline-primary" type="button" onclick="confirmCustomAsset()">
+                                                <i class="fas fa-check"></i> Confirm
+                                            </button>
+                                        </div>
+                                        <small class="form-text text-muted">Use Yahoo Finance symbols. For futures, add =F suffix (e.g., NQ=F)</small>
+                                    </div>
+                                </div>
+
+                                <!-- Timeframe Selection -->
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="fas fa-chart-line"></i> Timeframe
+                                    </label>
+                                    <div class="timeframe-selector">
+                                        <button type="button" class="timeframe-btn" data-timeframe="1m" onclick="selectTimeframe(this, '1m')">
+                                            1m
+                                        </button>
+                                        <button type="button" class="timeframe-btn" data-timeframe="15m" onclick="selectTimeframe(this, '15m')">
+                                            15m
+                                        </button>
+                                        <button type="button" class="timeframe-btn" data-timeframe="1h" onclick="selectTimeframe(this, '1h')">
+                                            1h
+                                        </button>
+                                        <button type="button" class="timeframe-btn" data-timeframe="4h" onclick="selectTimeframe(this, '4h')">
+                                            4h
+                                        </button>
+                                        <button type="button" class="timeframe-btn" data-timeframe="1d" onclick="selectTimeframe(this, '1d')">
+                                            1d
+                                        </button>
+                                        <button type="button" class="timeframe-btn" data-timeframe="1w" onclick="selectTimeframe(this, '1w')">
+                                            1w
+                                        </button>
+                                        <button type="button" class="timeframe-btn" data-timeframe="1mo" onclick="selectTimeframe(this, '1mo')">
+                                            1mo
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Panel 2: Date & Time Configuration -->
+                            <div class="panel">
+                                <h4 class="panel-title">
+                                    <i class="fas fa-calendar-alt"></i> Date & Time Configuration
+                                </h4>
+
+                                <!-- Date Range -->
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="fas fa-calendar-week"></i> Date Range
+                                    </label>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <input type="date" id="startDate" class="form-control" placeholder="mm/dd/yyyy" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <input type="date" id="endDate" class="form-control" placeholder="mm/dd/yyyy" required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Time Selector -->
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="fas fa-clock"></i> Time Selector
+                                    </label>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <input type="time" id="startTime" class="form-control" value="00:00" step="60">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <input type="time" id="endTime" class="form-control" value="23:59" step="60">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Current Time Option -->
+                                <div class="form-group">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="useCurrentTime" checked>
+                                        <label class="form-check-label" for="useCurrentTime">
+                                            Use current date & time for end
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Validation Messages -->
+                                <div id="dateRangeInfo" class="alert alert-info mt-2" style="display: none;">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span id="dateRangeText"></span>
+                                </div>
+
+                                <div id="dateRangeError" class="alert alert-danger mt-2" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <span id="dateRangeErrorText"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Run Analysis Button - Independent Section -->
+                        <div class="action-section mt-4 mb-4">
+                            <div class="text-center">
+                                <button class="btn btn-primary" id="analyzeBtn" onclick="runAnalysis()">
+                                    <i class="fas fa-play"></i> Run Analysis
+                                </button>
+                                <p class="text-muted mt-2">Configure your asset, timeframe, and date range above, then click to start analysis</p>
+                            </div>
+                        </div>
+
+                        <!-- Panel 3: Settings & Security - Full Width -->
+                        <div class="panel" style="width: 100%; margin-top: 2rem;">
+                            <h4 class="panel-title">
+                                <i class="fas fa-cog"></i> Settings & Security
+                            </h4>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <!-- API Provider Selection -->
+                                    <div class="form-group">
+                                        <label class="form-label">API Provider</label>
+                                        <select class="form-select" id="apiProviderSelect" onchange="updateApiKeyFields()">
+                                            <option value="openai">OpenAI</option>
+                                            <option value="deepseek" selected>DeepSeek</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- API Key Inputs -->
+                                    <div class="form-group" id="openaiApiGroup">
+                                        <label class="form-label">OpenAI API Key</label>
+                                        <div class="input-group">
+                                            <input type="password" class="form-control" id="openaiApiKeyInput" placeholder="Enter your OpenAI API key">
+                                            <button class="btn btn-outline-primary" type="button" onclick="updateOpenAIApiKey()">
+                                                <i class="fas fa-save"></i> Update
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" id="deepseekApiGroup">
+                                        <label class="form-label">DeepSeek API Key</label>
+                                        <div class="input-group">
+                                            <input type="password" class="form-control" id="deepseekApiKeyInput" placeholder="Enter your DeepSeek API key">
+                                            <button class="btn btn-outline-primary" type="button" onclick="updateDeepSeekApiKey()">
+                                                <i class="fas fa-save"></i> Update
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Chart Generation Toggle -->
+                                    <div class="form-group">
+                                        <label class="form-label">Chart Generation</label>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="generateCharts">
+                                            <label class="form-check-label" for="generateCharts">
+                                                Generate Charts (Slower)
+                                            </label>
+                                        </div>
+                                        <small class="form-text text-muted">
+                                            Enable this to generate visual charts for pattern and trend analysis. This will significantly increase analysis time.
+                                        </small>
+                                    </div>
+
+                                    <!-- Trading Strategy Selection -->
+                                    <div class="form-group">
+                                        <label class="form-label">Trading Strategy</label>
+                                        <div class="timeframe-selector">
+                                            <button type="button" class="timeframe-btn active" data-strategy="high_frequency" onclick="selectTradingStrategy(this, 'high_frequency')">
+                                                High Frequency
+                                            </button>
+                                            <button type="button" class="timeframe-btn" data-strategy="low_frequency" onclick="selectTradingStrategy(this, 'low_frequency')">
+                                                Low Frequency
+                                            </button>
+                                        </div>
+                                        <small class="form-text text-muted">
+                                            <span id="strategyDescription">High Frequency: Short-term trades with tight stop-loss. Low Frequency: Monthly to semi-annual holding periods.</span>
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <!-- Security Information -->
+                                    <div class="form-group">
+                                        <label class="form-label">Security Information</label>
+                                        <div class="security-info">
+                                            <div class="security-item">
+                                                <i class="fas fa-server security-icon"></i>
+                                                <div class="security-content">
+                                                    <strong>Localhost Only</strong>
+                                                    <p>This server runs exclusively on localhost (127.0.0.1)</p>
+                                                </div>
+                                            </div>
+
+                                            <div class="security-item">
+                                                <i class="fas fa-key security-icon"></i>
+                                                <div class="security-content">
+                                                    <strong>API Key Security</strong>
+                                                    <p>Your API key is stored locally and never uploaded to external servers</p>
+                                                </div>
+                                            </div>
+
+                                            <div class="security-item">
+                                                <i class="fas fa-shield-alt security-icon"></i>
+                                                <div class="security-content">
+                                                    <strong>Data Privacy</strong>
+                                                    <p>All analysis data remains on your local machine</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- API Key Status Messages -->
+                                    <div id="apiKeyStatus" class="alert alert-info mt-2" style="display: none;">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span id="apiKeyStatusText"></span>
+                                    </div>
+                                    <div id="apiKeyError" class="alert alert-danger mt-2" style="display: none;">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <span id="apiKeyErrorText"></span>
+                                    </div>
+                                    <div id="apiKeySuccess" class="alert alert-success mt-2" style="display: none;">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span id="apiKeySuccessText"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+           </section>
+        </main>
+    </div>
+    <script>
+        // Global variables
+        let currentAsset = '';
+        let currentTimeframe = '';
+
+        // Persisted state keys
+        const STORAGE_KEYS = {
+            CUSTOM_ASSETS: 'quantagent_custom_assets',
+            SELECTED_ASSET: 'quantagent_selected_asset',
+            SELECTED_TIMEFRAME: 'quantagent_selected_timeframe'
+        };
+
+        // Add or render a custom asset button into the grid
+        function addCustomAssetButton(symbol, isServerLoaded = false) {
+            const grid = document.getElementById('assetButtonGrid');
+            if (!grid) return;
+
+            // Prevent duplicates (check existing data-asset values)
+            const existing = Array.from(grid.querySelectorAll('.asset-btn')).some(btn => btn.dataset.asset === symbol);
+            if (existing) return;
+
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'asset-btn';
+            btn.dataset.asset = symbol;
+            btn.innerHTML = `<i class="fas fa-tag"></i> ${symbol}`;
+            btn.addEventListener('click', () => selectAsset(btn, symbol));
+
+            // Insert before the "Custom" button if present
+            const customBtn = document.getElementById('customAssetBtn');
+            if (customBtn && customBtn.parentNode === grid) {
+                grid.insertBefore(btn, customBtn);
+            } else {
+                grid.appendChild(btn);
+            }
+
+            // If loaded from server or localStorage, do not auto-select unless it matches stored selection
+            const storedSelected = localStorage.getItem(STORAGE_KEYS.SELECTED_ASSET);
+            if (storedSelected === symbol) {
+                // mimic click to set active and store
+                btn.click();
+            }
+        }
+
+        // Load custom assets from localStorage and server, render them
+        function loadCustomAssets() {
+            // Load from localStorage first (fast)
+            try {
+                const local = localStorage.getItem(STORAGE_KEYS.CUSTOM_ASSETS);
+                if (local) {
+                    const list = JSON.parse(local);
+                    list.forEach(sym => addCustomAssetButton(sym, false));
+                }
+            } catch (e) {
+                console.warn('Failed to parse local custom assets', e);
+            }
+
+            // Then attempt to load server-persisted custom assets and merge
+            fetch('/api/custom-assets')
+                .then(r => r.json())
+                .then(data => {
+                    if (Array.isArray(data.custom_assets)) {
+                        data.custom_assets.forEach(sym => addCustomAssetButton(sym, true));
+                        // Sync server list into localStorage (merge, dedupe)
+                        try {
+                            const local = JSON.parse(localStorage.getItem(STORAGE_KEYS.CUSTOM_ASSETS) || '[]');
+                            const merged = Array.from(new Set([...(local || []), ...data.custom_assets]));
+                            localStorage.setItem(STORAGE_KEYS.CUSTOM_ASSETS, JSON.stringify(merged));
+                        } catch (e) {
+                            console.warn('Failed to sync custom assets to localStorage', e);
+                        }
+                    }
+                })
+                .catch(err => {
+                    // Not fatal - server might not be reachable
+                    console.warn('Could not fetch server custom assets', err);
+                });
+        }
+
+        // Override confirmCustomAsset to create a persistent custom asset and persist to server/localStorage
+        function confirmCustomAsset() {
+            const customAssetEl = document.getElementById('customAssetInput');
+            const customAsset = customAssetEl.value.trim();
+
+            if (!customAsset) {
+                alert('Please enter a custom asset symbol.');
+                return;
+            }
+
+            // Normalize (trim)
+            const symbol = customAsset;
+
+            // Save to localStorage list
+            try {
+                const listRaw = localStorage.getItem(STORAGE_KEYS.CUSTOM_ASSETS);
+                const list = listRaw ? JSON.parse(listRaw) : [];
+                if (!list.includes(symbol)) {
+                    list.push(symbol);
+                    localStorage.setItem(STORAGE_KEYS.CUSTOM_ASSETS, JSON.stringify(list));
+                }
+            } catch (e) {
+                console.warn('Could not persist custom asset to localStorage', e);
+            }
+
+            // Persist to server (best-effort)
+            fetch('/api/save-custom-asset', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ symbol })
+            }).then(r => r.json())
+              .then(resp => {
+                  if (!resp.success) {
+                      console.warn('Server did not save custom asset', resp);
+                  }
+              }).catch(err => {
+                  console.warn('Error saving custom asset to server', err);
+              });
+
+            // Add button and select it
+            addCustomAssetButton(symbol);
+            // Select the new asset: find button and click
+            const grid = document.getElementById('assetButtonGrid');
+            const newBtn = Array.from(grid.querySelectorAll('.asset-btn')).find(b => b.dataset.asset === symbol);
+            if (newBtn) {
+                newBtn.click();
+            }
+
+            // Hide custom asset input
+            document.getElementById('customAssetDiv').style.display = 'none';
+
+            // Clear input
+            customAssetEl.value = '';
+
+            // Notify user
+            // Use a non-blocking notification (replace alert with console + subtle DOM message if desired)
+            console.log(`Custom asset "${symbol}" selected and persisted`);
+        }
+
+        // Updated selectAsset to persist selection to localStorage
+        function selectAsset(button, asset) {
+            // Remove active class from all asset buttons
+            document.querySelectorAll('.asset-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Add active class to clicked button
+            button.classList.add('active');
+
+            // Store selected asset
+            selectedAsset = asset;
+            try {
+                localStorage.setItem(STORAGE_KEYS.SELECTED_ASSET, asset);
+            } catch (e) {
+                console.warn('Could not persist selected asset', e);
+            }
+
+            // Hide custom asset input if it was showing
+            const cav = document.getElementById('customAssetDiv');
+            if (cav) cav.style.display = 'none';
+
+            console.log('Selected asset:', asset);
+        }
+
+        // Persist timeframe selection as well
+        function selectTimeframe(button, timeframe) {
+             // Remove active class from all timeframe buttons
+             document.querySelectorAll('.timeframe-btn').forEach(btn => {
+                 btn.classList.remove('active');
+             });
+
+             // Add active class to clicked button
+             button.classList.add('active');
+
+             // Store selected timeframe
+             selectedTimeframe = timeframe;
+             try {
+                 localStorage.setItem(STORAGE_KEYS.SELECTED_TIMEFRAME, timeframe);
+             } catch (e) {
+                 console.warn('Could not persist selected timeframe', e);
+             }
+
+            console.log('Selected timeframe:', timeframe);
+        }
+
+        // Handle trading strategy selection
+        function selectTradingStrategy(button, strategy) {
+            // 修复高亮问题：使用更精确的选择器
+            console.log('Attempting to select trading strategy:', strategy);
+            console.log('Button before adding active class:', button);
+
+            // Remove active class from all strategy buttons
+            document.querySelectorAll('.timeframe-selector button[data-strategy]').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Add active class to clicked button
+            button.classList.add('active');
+            console.log('Button after adding active class:', button);
+            console.log('Button classes:', button.className);
+
+            // Store selected strategy
+            selectedStrategy = strategy;
+            console.log('Stored selected strategy:', selectedStrategy);
+
+            // Update strategy description based on selection
+            const strategyDescription = document.getElementById('strategyDescription');
+            if (strategy === 'low_frequency') {
+                strategyDescription.textContent = 'Low Frequency: Monthly to semi-annual holding periods. Focuses on long-term trends and fundamental analysis.';
+                // 不再自动选择时间框架，保持用户选择
+            } else {
+                strategyDescription.textContent = 'High Frequency: Short-term trades with tight stop-loss. Focuses on technical indicators and short-term patterns.';
+            }
+
+            console.log('Selected trading strategy:', strategy);
+        }
+
+        // 不再使用这些函数，保持用户选择的时间框架
+        // function suggestLowFrequencyTimeframes() {
+        //     // Get all timeframe buttons
+        //     const timeframeButtons = document.querySelectorAll('.timeframe-btn[data-timeframe]');
+        //
+        //     // Deactivate all buttons first
+        //     timeframeButtons.forEach(btn => {
+        //         btn.classList.remove('active');
+        //     });
+        //
+        //     // Automatically select a longer timeframe for low frequency strategy
+        //     const longTermTimeframeBtn = document.querySelector('[data-timeframe="1w"]') || document.querySelector('[data-timeframe="1d"]');
+        //     if (longTermTimeframeBtn) {
+        //         longTermTimeframeBtn.click(); // Trigger click event to update selection
+        //     }
+        // }
+
+        // function restoreAllTimeframes() {
+        //     // Just ensure all timeframes are visible and active selection is preserved
+        //     // No specific action needed as all timeframes are already available
+        // }
+
+        // On page load, restore selected asset/timeframe and custom assets
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize API provider fields
+            updateApiKeyFields();
+            // Set default dates
+            const now = new Date();
+            const thirtyDaysAgo = new Date(now.getTime() - (60 * 24 * 60 * 60 * 1000));
+
+            // Format dates for input fields
+            const formatDate = (date) => {
+                return date.toISOString().split('T')[0];
+            };
+
+            // Set default start date (30 days ago)
+            document.getElementById('startDate').value = formatDate(thirtyDaysAgo);
+
+            // Set default end date (today)
+            document.getElementById('endDate').value = formatDate(now);
+
+            // Apply the current-time checkbox behavior immediately on load
+            // (this will disable & populate end date/time if the checkbox is checked by default)
+            try { handleUseCurrentTimeChange(); } catch (e) { console.warn('handleUseCurrentTimeChange not available yet', e); }
+
+            // Load custom assets and server-synced assets
+            loadCustomAssets();
+
+            // Restore selected timeframe (if saved)
+            try {
+                const savedTF = localStorage.getItem(STORAGE_KEYS.SELECTED_TIMEFRAME);
+                if (savedTF) {
+                    const tfBtn = Array.from(document.querySelectorAll('.timeframe-btn')).find(b => b.dataset.timeframe === savedTF);
+                    if (tfBtn) {
+                        tfBtn.classList.add('active');
+                        selectedTimeframe = savedTF;
+                    }
+                }
+            } catch (e) {
+                console.warn('Could not restore timeframe from localStorage', e);
+            }
+
+            // Restore selected asset (if saved). If it is a custom asset that hasn't been added yet,
+            // add it and then select it (addCustomAssetButton handles checking duplicates).
+            try {
+                const savedAsset = localStorage.getItem(STORAGE_KEYS.SELECTED_ASSET);
+                if (savedAsset) {
+                    // Try to find an existing button
+                    let btn = Array.from(document.querySelectorAll('.asset-btn')).find(b => b.dataset.asset === savedAsset);
+                    if (!btn) {
+                        // Add it as custom and then select
+                        addCustomAssetButton(savedAsset, false);
+                        btn = Array.from(document.querySelectorAll('.asset-btn')).find(b => b.dataset.asset === savedAsset);
+                    }
+                    if (btn) {
+                        btn.classList.add('active');
+                        selectedAsset = savedAsset;
+                    }
+                } else {
+                    // fallback defaults from original code
+                    const defaultTimeframeBtn = document.querySelector('[data-timeframe="1h"]');
+                    if (defaultTimeframeBtn && !selectedTimeframe) {
+                        defaultTimeframeBtn.classList.add('active');
+                        selectedTimeframe = '1h';
+                    }
+                    const defaultAssetBtn = document.querySelector('[data-asset="BTC"]');
+                    if (defaultAssetBtn && !selectedAsset) {
+                        defaultAssetBtn.classList.add('active');
+                        selectedAsset = 'BTC';
+                    }
+                }
+            } catch (e) {
+                console.warn('Could not restore selected asset from localStorage', e);
+            }
+
+            document.getElementById('useCurrentTime').addEventListener('change', handleUseCurrentTimeChange);
+
+            // Set up date/time validation
+            const dateInputs = ['startDate', 'startTime', 'endDate', 'endTime'];
+            dateInputs.forEach(id => {
+                document.getElementById(id).addEventListener('change', validateDateRange);
+            });
+
+            // Initialize current time update
+            setInterval(updateCurrentTime, 1000);
+
+            // Add keyboard navigation for timeframe selector
+            document.addEventListener('keydown', function(e) {
+                const activeBtn = document.querySelector('.timeframe-btn.active');
+                if (!activeBtn) return;
+
+                const buttons = Array.from(document.querySelectorAll('.timeframe-btn'));
+                const currentIndex = buttons.indexOf(activeBtn);
+
+                if (e.key === 'ArrowLeft' && currentIndex > 0) {
+                    buttons[currentIndex - 1].click();
+                } else if (e.key === 'ArrowRight' && currentIndex < buttons.length - 1) {
+                    buttons[currentIndex + 1].click();
+                }
+            });
+
+            // Check API key status on page load
+            checkApiKeyStatus();
+        });
+
+        function updateApiKeyFields() {
+            const provider = document.getElementById('apiProviderSelect').value;
+            document.getElementById('openaiApiGroup').style.display = provider === 'openai' ? 'block' : 'none';
+            document.getElementById('deepseekApiGroup').style.display = provider === 'deepseek' ? 'block' : 'none';
+        }
+
+        function checkApiKeyStatus() {
+            fetch('/api/get-api-key-status')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.has_openai_key) {
+                        showApiKeyStatus(`OpenAI API key is set: ${data.masked_openai_key}`);
+                    } else if (data.has_deepseek_key) {
+                        showApiKeyStatus(`DeepSeek API key is set: ${data.masked_deepseek_key}`);
+                    } else {
+                        showApiKeyError('No API key found. Please enter your API key.');
+                    }
+
+                    // Set the provider selection based on available keys
+                    if (data.has_deepseek_key) {
+                        document.getElementById('apiProviderSelect').value = 'deepseek';
+                    } else if (data.has_openai_key) {
+                        document.getElementById('apiProviderSelect').value = 'openai';
+                    }
+                    updateApiKeyFields();
+                })
+                .catch(error => {
+                    console.error('Error checking API key status:', error);
+                    showApiKeyError('Unable to check API key status');
+                });
+        }
+
+        function updateOpenAIApiKey() {
+            const apiKey = document.getElementById('openaiApiKeyInput').value.trim();
+            updateApiKey('openai', apiKey);
+        }
+
+        function updateDeepSeekApiKey() {
+            const apiKey = document.getElementById('deepseekApiKeyInput').value.trim();
+            updateApiKey('deepseek', apiKey);
+        }
+
+        function updateApiKey(provider, apiKey) {
+            if (!apiKey) {
+                showApiKeyError('Please enter an API key');
+                return;
+            }
+
+            // Hide previous messages
+            hideApiKeyMessages();
+
+            // Show loading state
+            const updateBtn = document.querySelector(`button[onclick="update${provider.charAt(0).toUpperCase() + provider.slice(1)}ApiKey()"]`);
+            const originalText = updateBtn.innerHTML;
+            updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+            updateBtn.disabled = true;
+
+            // Make API call to update the key
+            fetch('/api/update-api-key', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    provider: provider,
+                    api_key: apiKey
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showApiKeySuccess(`${provider.charAt(0).toUpperCase() + provider.slice(1)} API key updated successfully!`);
+                    document.getElementById(`${provider}ApiKeyInput`).value = '';
+                    // Update provider selection
+                    document.getElementById('apiProviderSelect').value = provider;
+                    updateApiKeyFields();
+                } else {
+                    showApiKeyError(data.error || 'Failed to update API key');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showApiKeyError('An error occurred while updating the API key');
+            })
+            .finally(() => {
+                // Reset button
+                updateBtn.innerHTML = originalText;
+                updateBtn.disabled = false;
+            });
+        }
+
+                 // Global variables
+         let selectedAsset = '';
+         let selectedTimeframe = '1h'; // Default timeframe
+         let selectedStrategy = 'high_frequency'; // Default strategy
+
+         function selectAsset(button, asset) {
+             // Remove active class from all asset buttons
+             document.querySelectorAll('.asset-btn').forEach(btn => {
+                 btn.classList.remove('active');
+             });
+
+             // Add active class to clicked button
+             button.classList.add('active');
+
+             // Store selected asset
+             selectedAsset = asset;
+             try {
+                 localStorage.setItem(STORAGE_KEYS.SELECTED_ASSET, asset);
+             } catch (e) {
+                 console.warn('Could not persist selected asset', e);
+             }
+
+             // Hide custom asset input if it was showing
+             const cav = document.getElementById('customAssetDiv');
+             if (cav) cav.style.display = 'none';
+
+             console.log('Selected asset:', asset);
+         }
+
+         function showCustomAssetInput() {
+             // Remove active class from all asset buttons
+             document.querySelectorAll('.asset-btn').forEach(btn => {
+                 btn.classList.remove('active');
+             });
+
+             // Show custom asset input
+             document.getElementById('customAssetDiv').style.display = 'block';
+             document.getElementById('customAssetInput').focus();
+
+             // Clear selected asset
+             selectedAsset = '';
+         }
+
+         function confirmCustomAsset() {
+             const customAssetEl = document.getElementById('customAssetInput');
+             const customAsset = customAssetEl.value.trim();
+
+             if (!customAsset) {
+                 alert('Please enter a custom asset symbol.');
+                 return;
+             }
+
+             // Normalize (trim)
+             const symbol = customAsset;
+
+             // Save to localStorage list
+             try {
+                 const listRaw = localStorage.getItem(STORAGE_KEYS.CUSTOM_ASSETS);
+                 const list = listRaw ? JSON.parse(listRaw) : [];
+                 if (!list.includes(symbol)) {
+                     list.push(symbol);
+                     localStorage.setItem(STORAGE_KEYS.CUSTOM_ASSETS, JSON.stringify(list));
+                 }
+             } catch (e) {
+                 console.warn('Could not persist custom asset to localStorage', e);
+             }
+
+             // Persist to server (best-effort)
+             fetch('/api/save-custom-asset', {
+                 method: 'POST',
+                 headers: { 'Content-Type': 'application/json' },
+                 body: JSON.stringify({ symbol })
+             }).then(r => r.json())
+               .then(resp => {
+                   if (!resp.success) {
+                       console.warn('Server did not save custom asset', resp);
+                   }
+               }).catch(err => {
+                   console.warn('Error saving custom asset to server', err);
+               });
+
+            // Add button and select it
+            addCustomAssetButton(symbol);
+            // Select the new asset: find button and click
+            const grid = document.getElementById('assetButtonGrid');
+            const newBtn = Array.from(grid.querySelectorAll('.asset-btn')).find(b => b.dataset.asset === symbol);
+            if (newBtn) {
+                newBtn.click();
+            }
+
+            // Hide custom asset input
+            document.getElementById('customAssetDiv').style.display = 'none';
+
+            // Clear input
+            customAssetEl.value = '';
+
+            // Notify user
+            // Use a non-blocking notification (replace alert with console + subtle DOM message if desired)
+            console.log(`Custom asset "${symbol}" selected and persisted`);
+         }
+
+                 function runAnalysis() {
+             const dataSource = 'live'; // Always use live data
+             const timeframe = selectedTimeframe;
+
+             // Get asset value from selected asset
+             let asset = selectedAsset;
+
+             // Validate inputs
+             if (!asset || !timeframe) {
+                 alert('Please select both asset and timeframe.');
+                 return;
+             }
+
+             // Get date and time values
+             const startDate = document.getElementById('startDate').value;
+             const startTime = document.getElementById('startTime').value;
+             const endDate = document.getElementById('endDate').value;
+             const endTime = document.getElementById('endTime').value;
+             const useCurrentTime = document.getElementById('useCurrentTime').checked;
+
+             // Validate dates
+             if (!startDate || !endDate) {
+                 alert('Please select both start and end dates.');
+                 return;
+             }
+
+             // Show loading state
+             const analyzeBtn = document.getElementById('analyzeBtn');
+             const originalText = analyzeBtn.innerHTML;
+             analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+             analyzeBtn.disabled = true;
+
+             // Get chart generation setting
+             const generateCharts = document.getElementById('generateCharts').checked;
+
+             // Prepare request data
+             const requestData = {
+                 data_source: dataSource,
+                 asset: asset,
+                 timeframe: timeframe,
+                 start_date: startDate,
+                 start_time: startTime,
+                 end_date: endDate,
+                 end_time: endTime,
+                 use_current_time: useCurrentTime,
+                 generate_charts: generateCharts,
+                 trading_strategy: selectedStrategy, // Add trading strategy to request data
+                 redirect_to_output: true
+             };
+
+             // Make API call
+             fetch('/api/analyze', {
+                 method: 'POST',
+                 headers: {
+                     'Content-Type': 'application/json',
+                 },
+                 body: JSON.stringify(requestData)
+             })
+             .then(response => response.json())
+             .then(data => {
+                 if (data.redirect) {
+                     // Redirect to output page with results
+                     window.location.href = data.redirect;
+                 } else if (data.error) {
+                     // Show error message
+                     alert('Analysis failed: ' + data.error);
+                     // Reset button
+                     analyzeBtn.innerHTML = originalText;
+                     analyzeBtn.disabled = false;
+                 } else {
+                     // Handle other responses
+                     console.log('Analysis completed:', data);
+                     alert('Analysis completed successfully!');
+                     // Reset button
+                     analyzeBtn.innerHTML = originalText;
+                     analyzeBtn.disabled = false;
+                 }
+             })
+             .catch(error => {
+                 console.error('Error:', error);
+                 alert('An error occurred during analysis. Please try again.');
+                 // Reset button
+                 analyzeBtn.innerHTML = originalText;
+                 analyzeBtn.disabled = false;
+             });
+        }
+
+        function handleUseCurrentTimeChange() {
+            const useCurrentTime = document.getElementById('useCurrentTime');
+            const endTimeInput = document.getElementById('endTime');
+            const endDateInput = document.getElementById('endDate');
+
+            if (useCurrentTime.checked) {
+                // Lock both end date and end time
+                endTimeInput.disabled = true;
+                endDateInput.disabled = true;
+                endTimeInput.style.opacity = '0.5';
+                endDateInput.style.opacity = '0.5';
+
+                // Set to current date and time
+                const now = new Date();
+                const currentDate = now.toISOString().split('T')[0];
+                const currentTime = now.toTimeString().slice(0, 5); // HH:MM format
+
+                endDateInput.value = currentDate;
+                endTimeInput.value = currentTime;
+
+                // Add visual indication
+                endDateInput.title = 'Locked: Using current date/time';
+                endTimeInput.title = 'Locked: Using current date/time';
+            } else {
+                // Unlock both inputs
+                endTimeInput.disabled = false;
+                endDateInput.disabled = false;
+                endTimeInput.style.opacity = '1';
+                endDateInput.style.opacity = '1';
+
+                // Remove visual indication
+                endDateInput.title = '';
+                endTimeInput.title = '';
+            }
+        }
+
+        function updateCurrentTime() {
+            const useCurrentTime = document.getElementById('useCurrentTime');
+            if (useCurrentTime.checked) {
+                const now = new Date();
+                const currentDate = now.toISOString().split('T')[0];
+                const currentTime = now.toTimeString().slice(0, 5); // HH:MM format
+
+                document.getElementById('endDate').value = currentDate;
+                document.getElementById('endTime').value = currentTime;
+            }
+        }
+
+        function validateDateRange() {
+            // Simple date validation
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            if (startDate && endDate && startDate > endDate) {
+                document.getElementById('dateRangeError').style.display = 'block';
+                document.getElementById('dateRangeErrorText').textContent = 'Start date cannot be after end date';
+            } else {
+                document.getElementById('dateRangeError').style.display = 'none';
+            }
+        }
+
+        function hideDateValidation() {
+            document.getElementById('dateRangeError').style.display = 'none';
+            document.getElementById('dateRangeInfo').style.display = 'none';
+        }
+
+                 function updateTimeframeLimits() {
+             // Placeholder for timeframe limits functionality
+             console.log('Timeframe limits updated');
+         }
+
+         // API Key Management Functions
+         function updateApiKey() {
+             const apiKey = document.getElementById('apiKeyInput').value.trim();
+             const provider = document.getElementById('apiProviderSelect').value;
+
+             if (!apiKey) {
+                 showApiKeyError('Please enter an API key');
+                 return;
+             }
+
+             // Hide previous messages
+             hideApiKeyMessages();
+
+             // Show loading state
+             const updateBtn = document.querySelector('button[onclick="updateApiKey()"]');
+             const originalText = updateBtn.innerHTML;
+             updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+             updateBtn.disabled = true;
+
+             // Make API call to update the key
+             fetch('/api/update-api-key', {
+                 method: 'POST',
+                 headers: {
+                     'Content-Type': 'application/json',
+                 },
+                 body: JSON.stringify({ api_key: apiKey, provider: provider })
+             })
+             .then(response => response.json())
+             .then(data => {
+                 if (data.success) {
+                     showApiKeySuccess('API key updated successfully!');
+                     document.getElementById('apiKeyInput').value = '';
+                 } else {
+                     showApiKeyError(data.error || 'Failed to update API key');
+                 }
+             })
+             .catch(error => {
+                 console.error('Error:', error);
+                 showApiKeyError('An error occurred while updating the API key');
+             })
+             .finally(() => {
+                 // Reset button
+                 updateBtn.innerHTML = originalText;
+                 updateBtn.disabled = false;
+             });
+         }
+
+         function showApiKeySuccess(message) {
+             const successDiv = document.getElementById('apiKeySuccess');
+             const successText = document.getElementById('apiKeySuccessText');
+             successText.textContent = message;
+             successDiv.style.display = 'block';
+
+             // Hide after 5 seconds
+             setTimeout(() => {
+                 successDiv.style.display = 'none';
+             }, 5000);
+         }
+
+         function showApiKeyError(message) {
+             const errorDiv = document.getElementById('apiKeyError');
+             const errorText = document.getElementById('apiKeyErrorText');
+             errorText.textContent = message;
+             errorDiv.style.display = 'block';
+
+             // Hide after 5 seconds
+             setTimeout(() => {
+                 errorDiv.style.display = 'none';
+             }, 5000);
+         }
+
+         function hideApiKeyMessages() {
+            document.getElementById('apiKeyError').style.display = 'none';
+            document.getElementById('apiKeySuccess').style.display = 'none';
+            // 检查是否存在apiKeyStatus元素，如果存在也隐藏它
+            const statusElement = document.getElementById('apiKeyStatus');
+            if (statusElement) {
+                statusElement.style.display = 'none';
+            }
+        }
+
+        // 添加缺失的showApiKeyStatus函数
+        function showApiKeyStatus(message) {
+            // 查找或创建apiKeyStatus元素
+            let statusDiv = document.getElementById('apiKeyStatus');
+            let statusText = document.getElementById('apiKeyStatusText');
+
+            if (!statusDiv) {
+                // 如果元素不存在，创建它
+                const apiKeySection = document.getElementById('apiKeySection');
+                if (apiKeySection) {
+                    // 查找error和success元素的位置
+                    const errorDiv = document.getElementById('apiKeyError');
+
+                    // 创建status元素
+                    statusDiv = document.createElement('div');
+                    statusDiv.id = 'apiKeyStatus';
+                    statusDiv.className = 'alert alert-info mt-3';
+                    statusDiv.style.display = 'none';
+
+                    statusText = document.createElement('p');
+                    statusText.id = 'apiKeyStatusText';
+
+                    statusDiv.appendChild(statusText);
+
+                    // 插入到error元素之前
+                    if (errorDiv) {
+                        apiKeySection.insertBefore(statusDiv, errorDiv);
+                    } else {
+                        apiKeySection.appendChild(statusDiv);
+                    }
+                }
+            }
+
+            // 设置消息文本并显示
+            if (statusText) {
+                statusText.textContent = message;
+            }
+            if (statusDiv) {
+                statusDiv.style.display = 'block';
+            }
+        }
+
+        // ==================== 历史记录功能 ====================
+
+        // 后端数据库交互函数
+        let sessionId = null;
+
+        // 初始化会话ID
+        function initSessionId() {
+            // 生成或获取会话ID
+            if (!sessionId) {
+                sessionId = localStorage.getItem('quantagent_session_id');
+                if (!sessionId) {
+                    sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                    localStorage.setItem('quantagent_session_id', sessionId);
+                }
+            }
+            return sessionId;
+        }
+
+        // 保存查询记录到后端数据库
+        function saveQueryRecord(queryData, resultSummary = null, resultDetails = null) {
+            try {
+                const sessionId = initSessionId();
+
+                const saveData = {
+                    asset: queryData.asset,
+                    timeframe: queryData.timeframe,
+                    start_date: queryData.start_date,
+                    end_date: queryData.end_date,
+                    start_time: queryData.start_time,
+                    end_time: queryData.end_time,
+                    use_current_time: queryData.use_current_time,
+                    generate_charts: queryData.generate_charts,
+                    trading_strategy: queryData.trading_strategy,
+                    analysis_params: queryData,
+                    result_summary: resultSummary,
+                    result_details: resultDetails,
+                    status: 'pending',
+                    session_id: sessionId
+                };
+
+                console.log('保存查询记录到后端数据库:', saveData);
+
+                fetch('/api/history/save', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(saveData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('查询记录已保存到后端数据库，记录ID:', data.history_id);
+                        // 将记录ID存储到本地，以便后续更新
+                        localStorage.setItem('last_history_id', data.history_id);
+                    } else {
+                        console.error('保存查询记录失败:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('保存查询记录时出错:', error);
+                });
+            } catch (error) {
+                console.error('保存查询记录时出错:', error);
+            }
+        }
+
+        // 保存查询记录到数据库
+        function saveQueryRecord(queryData, resultSummary = null, resultDetails = null) {
+            try {
+                if (!historyDb) {
+                    console.warn('数据库未初始化，无法保存查询记录');
+                    return;
+                }
+
+                const transaction = historyDb.transaction(['query_history'], 'readwrite');
+                const objectStore = transaction.objectStore('query_history');
+
+                const record = {
+                    timestamp: new Date().toISOString(),
+                    asset: queryData.asset,
+                    timeframe: queryData.timeframe,
+                    startDate: queryData.start_date,
+                    startTime: queryData.start_time,
+                    endDate: queryData.end_date,
+                    endTime: queryData.end_time,
+                    useCurrentTime: queryData.use_current_time,
+                    generateCharts: queryData.generate_charts,
+                    tradingStrategy: queryData.trading_strategy,
+                    resultSummary: resultSummary,
+                    resultDetails: resultDetails, // 新增：详细结果数据
+                    status: 'pending' // 初始状态为pending
+                };
+
+                const request = objectStore.add(record);
+
+                request.onsuccess = function() {
+                    console.log('查询记录已保存到数据库，记录ID:', request.result);
+                };
+
+                request.onerror = function(event) {
+                    console.error('保存查询记录失败:', event.target.errorCode);
+                };
+            } catch (error) {
+                console.error('保存查询记录时出错:', error);
+            }
+        }
+
+        // 更新查询记录状态
+        function updateQueryRecordStatus(queryData, status, errorMessage = null) {
+            try {
+                const lastHistoryId = localStorage.getItem('last_history_id');
+                if (!lastHistoryId) {
+                    console.warn('未找到最近的历史记录ID，无法更新状态');
+                    return;
+                }
+
+                const updateData = {
+                    history_id: parseInt(lastHistoryId),
+                    status: status,
+                    error_message: errorMessage
+                };
+
+                console.log('更新查询记录状态:', updateData);
+
+                fetch('/api/history/update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(updateData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('查询记录状态已更新为:', status);
+                    } else {
+                        console.error('更新查询记录状态失败:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('更新查询记录状态时出错:', error);
+                });
+            } catch (error) {
+                console.error('更新查询记录状态时出错:', error);
+            }
+        }
+
+        // 更新查询记录结果
+        function updateQueryRecordWithResult(queryData, resultSummary, resultDetails = null) {
+            try {
+                const lastHistoryId = localStorage.getItem('last_history_id');
+                if (!lastHistoryId) {
+                    console.warn('未找到最近的历史记录ID，无法更新结果');
+                    return;
+                }
+
+                const updateData = {
+                    history_id: parseInt(lastHistoryId),
+                    result_summary: resultSummary,
+                    result_details: resultDetails,
+                    status: 'completed'
+                };
+
+                console.log('更新查询记录结果:', updateData);
+
+                fetch('/api/history/update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(updateData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('查询记录结果已更新，包含详细结果数据');
+                    } else {
+                        console.error('更新查询记录结果失败:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('更新查询记录结果时出错:', error);
+                });
+            } catch (error) {
+                console.error('更新查询记录结果时出错:', error);
+            }
+        }
+
+        // 保存详细结果数据
+        function saveResultDetails(queryData, resultDetails) {
+            try {
+                const lastHistoryId = localStorage.getItem('last_history_id');
+                if (!lastHistoryId) {
+                    console.warn('未找到最近的历史记录ID，无法保存详细结果');
+                    return;
+                }
+
+                const updateData = {
+                    history_id: parseInt(lastHistoryId),
+                    result_details: resultDetails
+                };
+
+                console.log('保存详细结果数据:', updateData);
+
+                fetch('/api/history/update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(updateData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('详细结果数据已保存到数据库');
+                    } else {
+                        console.error('保存详细结果数据失败:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('保存详细结果数据时出错:', error);
+                });
+            } catch (error) {
+                console.error('保存详细结果数据时出错:', error);
+            }
+        }
+
+        // 获取历史查询记录
+        function getQueryHistory(filterOptions = {}) {
+            return new Promise((resolve, reject) => {
+                try {
+                    // 构建查询参数
+                    const params = new URLSearchParams();
+                    params.append('limit', filterOptions.limit || 50);
+                    params.append('days_back', filterOptions.daysBack || 30);
+
+                    if (filterOptions.asset) {
+                        params.append('asset', filterOptions.asset);
+                    }
+                    if (filterOptions.timeframe) {
+                        params.append('timeframe', filterOptions.timeframe);
+                    }
+                    if (filterOptions.status) {
+                        params.append('status', filterOptions.status);
+                    }
+
+                    const sessionId = initSessionId();
+                    params.append('session_id', sessionId);
+
+                    console.log('获取历史查询记录，参数:', params.toString());
+
+                    fetch(`/api/history/list?${params.toString()}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            console.log('获取历史记录成功，记录数:', data.history.length);
+                            resolve(data.history);
+                        } else {
+                            reject(new Error(data.error || '获取历史记录失败'));
+                        }
+                    })
+                    .catch(error => {
+                        reject(error);
+                    });
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        }
+
+        // 删除查询记录
+        function deleteQueryRecord(recordId) {
+            return new Promise((resolve, reject) => {
+                try {
+                    console.log('删除查询记录，ID:', recordId);
+
+                    fetch(`/api/history/${recordId}`, {
+                        method: 'DELETE'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            console.log('删除查询记录成功');
+                            resolve(true);
+                        } else {
+                            reject(new Error(data.error || '删除记录失败'));
+                        }
+                    })
+                    .catch(error => {
+                        reject(error);
+                    });
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        }
+
+        // 清除所有查询记录
+        function clearAllQueryHistory() {
+            return new Promise((resolve, reject) => {
+                try {
+                    console.log('清除所有查询记录');
+
+                    fetch('/api/history/clear', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({})
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            console.log('清除所有查询记录成功，删除记录数:', data.deleted_count);
+                            resolve(true);
+                        } else {
+                            reject(new Error(data.error || '清除记录失败'));
+                        }
+                    })
+                    .catch(error => {
+                        reject(error);
+                    });
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        }
+
+        // 修改runAnalysis函数以保存查询记录
+        function runAnalysis() {
+            const dataSource = 'live'; // Always use live data
+            const timeframe = selectedTimeframe;
+
+            // Get asset value from selected asset
+            let asset = selectedAsset;
+
+            // Validate inputs
+            if (!asset || !timeframe) {
+                alert('Please select both asset and timeframe.');
+                return;
+            }
+
+            // Get date and time values
+            const startDate = document.getElementById('startDate').value;
+            const startTime = document.getElementById('startTime').value;
+            const endDate = document.getElementById('endDate').value;
+            const endTime = document.getElementById('endTime').value;
+            const useCurrentTime = document.getElementById('useCurrentTime').checked;
+
+            // Validate dates
+            if (!startDate || !endDate) {
+                alert('Please select both start and end dates.');
+                return;
+            }
+
+            // Show loading state
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            const originalText = analyzeBtn.innerHTML;
+            analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+            analyzeBtn.disabled = true;
+
+            // Get chart generation setting
+            const generateCharts = document.getElementById('generateCharts').checked;
+
+            // Prepare request data
+            const requestData = {
+                data_source: dataSource,
+                asset: asset,
+                timeframe: timeframe,
+                start_date: startDate,
+                start_time: startTime,
+                end_date: endDate,
+                end_time: endTime,
+                use_current_time: useCurrentTime,
+                generate_charts: generateCharts,
+                trading_strategy: selectedStrategy, // Add trading strategy to request data
+                redirect_to_output: true
+            };
+
+            console.log('开始分析，准备保存查询记录:', requestData);
+
+            // 在发送API请求前先保存查询记录
+            saveQueryRecord(requestData);
+
+            // Make API call
+            fetch('/api/analyze', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.redirect) {
+                    console.log('分析完成，页面将重定向到结果页面');
+                    // 保存查询记录到数据库（已经提前保存，这里可以更新状态）
+                    updateQueryRecordStatus(requestData, 'completed');
+                    // 如果有详细结果数据，也保存
+                    if (data.result_details) {
+                        saveResultDetails(requestData, data.result_details);
+                    }
+                    // Redirect to output page with results
+                    window.location.href = data.redirect;
+                } else if (data.error) {
+                    console.error('分析失败:', data.error);
+                    // 更新查询记录状态为失败
+                    updateQueryRecordStatus(requestData, 'failed', data.error);
+                    // Show error message
+                    alert('Analysis failed: ' + data.error);
+                    // Reset button
+                    analyzeBtn.innerHTML = originalText;
+                    analyzeBtn.disabled = false;
+                } else {
+                    console.log('分析完成，结果:', data);
+                    // 保存查询记录到数据库（包含结果摘要和详细结果）
+                    const resultDetails = data.result_details || {
+                        analysis: data.analysis,
+                        patterns: data.patterns,
+                        indicators: data.indicators,
+                        suggestions: data.suggestions,
+                        volatility: data.volatility
+                    };
+                    updateQueryRecordWithResult(requestData, data.summary, resultDetails);
+                    // Handle other responses
+                    console.log('Analysis completed:', data);
+                    alert('Analysis completed successfully!');
+                    // Reset button
+                    analyzeBtn.innerHTML = originalText;
+                    analyzeBtn.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('API调用错误:', error);
+                // 更新查询记录状态为错误
+                updateQueryRecordStatus(requestData, 'error', error.message);
+                alert('An error occurred during analysis. Please try again.');
+                // Reset button
+                analyzeBtn.innerHTML = originalText;
+                analyzeBtn.disabled = false;
+            });
+        }
+
+        // 显示历史记录模态框
+        function showHistoryModal() {
+            // 检查历史记录模态框是否已存在，如果不存在则创建
+            let modal = document.getElementById('historyModal');
+            if (!modal) {
+                // 创建历史记录模态框
+                modal = document.createElement('div');
+                modal.id = 'historyModal';
+                modal.className = 'modal fade';
+                modal.tabIndex = -1;
+                modal.setAttribute('aria-labelledby', 'historyModalLabel');
+                modal.setAttribute('aria-hidden', 'true');
+
+                modal.innerHTML = `
+                    <div class="modal-dialog modal-xl">
+                        <div class="modal-content" style="border-radius: 16px; border: 2px solid var(--gray-200);">
+                            <div class="modal-header" style="background: var(--etrade-purple); color: white; border-radius: 14px 14px 0 0;">
+                                <h5 class="modal-title" id="historyModalLabel" style="font-size: 1.5rem; font-weight: 600;">
+                                    <i class="fas fa-history me-2"></i>查询历史记录
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1);"></button>
+                            </div>
+                            <div class="modal-body">
+                                <!-- 筛选选项 -->
+                                <div class="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <label class="form-label">资产</label>
+                                            <select id="historyAssetFilter" class="form-select">
+                                                <option value="">所有资产</option>
+                                                <option value="BTC">BTC</option>
+                                                <option value="ETH">ETH</option>
+                                                <option value="TSLA">TSLA</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">时间周期</label>
+                                            <select id="historyTimeframeFilter" class="form-select">
+                                                <option value="">所有周期</option>
+                                                <option value="1m">1m</option>
+                                                <option value="15m">15m</option>
+                                                <option value="1h">1h</option>
+                                                <option value="4h">4h</option>
+                                                <option value="1d">1d</option>
+                                                <option value="1w">1w</option>
+                                                <option value="1mo">1mo</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">时间范围</label>
+                                            <select id="historyDateRangeFilter" class="form-select">
+                                                <option value="1month" selected>过去1个月</option>
+                                                <option value="3months">过去3个月</option>
+                                                <option value="6months">过去6个月</option>
+                                                <option value="1year">过去1年</option>
+                                                <option value="all">所有时间</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">&nbsp;</label>
+                                            <button id="historyFilterBtn" class="btn btn-primary w-full">
+                                                <i class="fas fa-filter me-1"></i>筛选
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 操作按钮 -->
+                                <div class="mb-4 text-right">
+                                    <button id="clearHistoryBtn" class="btn btn-outline-danger">
+                                        <i class="fas fa-trash-alt me-1"></i>清除历史记录
+                                    </button>
+                                </div>
+
+                                <!-- 历史记录表格 -->
+                                <div class="table-responsive">
+                                    <table id="historyTable" class="table table-hover table-striped">
+                                        <thead style="background: var(--etrade-purple-bg);">
+                                            <tr>
+                                                <th style="font-weight: 600; color: var(--etrade-purple);">时间</th>
+                                                <th style="font-weight: 600; color: var(--etrade-purple);">资产</th>
+                                                <th style="font-weight: 600; color: var(--etrade-purple);">时间周期</th>
+                                                <th style="font-weight: 600; color: var(--etrade-purple);">日期范围</th>
+                                                <th style="font-weight: 600; color: var(--etrade-purple);">策略</th>
+                                                <th style="font-weight: 600; color: var(--etrade-purple);">图表</th>
+                                                <th style="font-weight: 600; color: var(--etrade-purple);">操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="historyTableBody">
+                                            <!-- 历史记录将通过JavaScript动态添加 -->
+                                            <tr>
+                                                <td colspan="7" class="text-center">
+                                                    <i class="fas fa-spinner fa-spin me-2"></i>加载历史记录中...
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">
+                                    关闭
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+
+                // 添加筛选按钮事件
+                document.getElementById('historyFilterBtn').addEventListener('click', loadHistoryRecords);
+
+                // 添加清除历史记录按钮事件
+                document.getElementById('clearHistoryBtn').addEventListener('click', function() {
+                    if (confirm('确定要清除所有历史记录吗？此操作不可恢复。')) {
+                        clearAllQueryHistory().then(() => {
+                            alert('历史记录已清除');
+                            loadHistoryRecords();
+                        }).catch(error => {
+                            console.error('清除历史记录失败:', error);
+                            alert('清除历史记录失败，请重试');
+                        });
+                    }
+                });
+            }
+
+            // 加载历史记录
+            loadHistoryRecords();
+
+            // 显示模态框
+            const bootstrapModal = new bootstrap.Modal(modal);
+            bootstrapModal.show();
+        }
+
+        // 显示结果明细模态框
+        function showResultDetails(recordId) {
+            // 检查结果明细模态框是否已存在，如果不存在则创建
+            let modal = document.getElementById('resultDetailsModal');
+            if (!modal) {
+                // 创建结果明细模态框
+                modal = document.createElement('div');
+                modal.id = 'resultDetailsModal';
+                modal.className = 'modal fade';
+                modal.tabIndex = -1;
+                modal.setAttribute('aria-labelledby', 'resultDetailsModalLabel');
+                modal.setAttribute('aria-hidden', 'true');
+
+                modal.innerHTML = `
+                    <div class="modal-dialog modal-xl">
+                        <div class="modal-content" style="border-radius: 16px; border: 2px solid var(--gray-200);">
+                            <div class="modal-header" style="background: var(--etrade-purple); color: white; border-radius: 14px 14px 0 0;">
+                                <h5 class="modal-title" id="resultDetailsModalLabel" style="font-size: 1.5rem; font-weight: 600;">
+                                    <i class="fas fa-chart-bar me-2"></i>分析结果明细
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1);"></button>
+                            </div>
+                            <div class="modal-body">
+                                <!-- 查询基本信息 -->
+                                <div class="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                    <h6 class="mb-3" style="color: var(--etrade-purple);">
+                                        <i class="fas fa-info-circle me-2"></i>查询基本信息
+                                    </h6>
+                                    <div class="row" id="resultBasicInfo">
+                                        <!-- 基本信息将通过JavaScript动态添加 -->
+                                    </div>
+                                </div>
+
+                                <!-- 分析结果摘要 -->
+                                <div class="mb-4 p-3 bg-light rounded-lg border border-gray-200">
+                                    <h6 class="mb-3" style="color: var(--etrade-purple);">
+                                        <i class="fas fa-file-alt me-2"></i>分析结果摘要
+                                    </h6>
+                                    <div id="resultSummaryContent">
+                                        <!-- 结果摘要将通过JavaScript动态添加 -->
+                                    </div>
+                                </div>
+
+                                <!-- 详细分析结果 -->
+                                <div class="mb-4">
+                                    <h6 class="mb-3" style="color: var(--etrade-purple);">
+                                        <i class="fas fa-chart-line me-2"></i>详细分析结果
+                                    </h6>
+                                    <div id="resultDetailsContent" class="bg-white p-3 rounded-lg border border-gray-200">
+                                        <!-- 详细结果将通过JavaScript动态添加 -->
+                                    </div>
+                                </div>
+
+                                <!-- 技术指标分析 -->
+                                <div class="mb-4">
+                                    <h6 class="mb-3" style="color: var(--etrade-purple);">
+                                        <i class="fas fa-cogs me-2"></i>技术指标分析
+                                    </h6>
+                                    <div id="technicalIndicators" class="bg-white p-3 rounded-lg border border-gray-200">
+                                        <!-- 技术指标将通过JavaScript动态添加 -->
+                                    </div>
+                                </div>
+
+                                <!-- 交易建议 -->
+                                <div class="mb-4">
+                                    <h6 class="mb-3" style="color: var(--etrade-purple);">
+                                        <i class="fas fa-lightbulb me-2"></i>交易建议
+                                    </h6>
+                                    <div id="tradingSuggestions" class="bg-white p-3 rounded-lg border border-gray-200">
+                                        <!-- 交易建议将通过JavaScript动态添加 -->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">
+                                    关闭
+                                </button>
+                                <button type="button" class="btn btn-primary" onclick="exportResultDetails()">
+                                    <i class="fas fa-download me-1"></i>导出结果
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            }
+
+            // 加载结果明细数据
+            loadResultDetails(recordId);
+
+            // 显示模态框
+            const bootstrapModal = new bootstrap.Modal(modal);
+            bootstrapModal.show();
+        }
+
+        // 加载结果明细数据
+        function loadResultDetails(recordId) {
+            try {
+                console.log('加载结果明细数据，记录ID:', recordId);
+
+                fetch(`/api/history/${recordId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('加载结果明细数据成功:', data.record);
+                        displayResultDetails(data.record);
+                    } else {
+                        console.error('未找到指定的查询记录:', data.error);
+                        alert('未找到指定的查询记录');
+                    }
+                })
+                .catch(error => {
+                    console.error('加载结果明细失败:', error);
+                    alert('加载结果明细失败');
+                });
+            } catch (error) {
+                console.error('加载结果明细时出错:', error);
+                alert('加载结果明细时出错');
+            }
+        }
+
+        // 显示结果明细
+        function displayResultDetails(record) {
+            // 显示基本信息
+            const basicInfoHtml = `
+                <div class="col-md-3">
+                    <strong>资产:</strong> ${record.asset || '未知'}
+                </div>
+                <div class="col-md-3">
+                    <strong>时间周期:</strong> ${record.timeframe || '未知'}
+                </div>
+                <div class="col-md-3">
+                    <strong>日期范围:</strong> ${record.start_date || '未知'} - ${record.end_date || '未知'}
+                </div>
+                <div class="col-md-3">
+                    <strong>查询时间:</strong> ${record.timestamp ? new Date(record.timestamp).toLocaleString('zh-CN') : '未知'}
+                </div>
+            `;
+            document.getElementById('resultBasicInfo').innerHTML = basicInfoHtml;
+
+            // 显示结果摘要 - 修复字段名问题
+            const summaryHtml = record.result_summary ?
+                `<div class="alert alert-info">${record.result_summary}</div>` :
+                `<div class="text-muted">暂无结果摘要</div>`;
+            document.getElementById('resultSummaryContent').innerHTML = summaryHtml;
+
+            // 显示详细结果 - 修复字段名问题和增强错误处理
+            try {
+                if (record.result_details) {
+                    displayDetailedResults(record.result_details);
+                } else {
+                    document.getElementById('resultDetailsContent').innerHTML = '<div class="alert alert-warning">该记录没有保存详细结果数据</div>';
+                    document.getElementById('technicalIndicators').innerHTML = '<div class="text-muted">暂无技术指标数据</div>';
+                    document.getElementById('tradingSuggestions').innerHTML = '<div class="text-muted">暂无交易建议</div>';
+                }
+            } catch (error) {
+                console.error('显示结果明细时出错:', error);
+                document.getElementById('resultDetailsContent').innerHTML = '<div class="alert alert-danger">显示结果数据时出错</div>';
+                document.getElementById('technicalIndicators').innerHTML = '<div class="text-muted">数据加载失败</div>';
+                document.getElementById('tradingSuggestions').innerHTML = '<div class="text-muted">数据加载失败</div>';
+            }
+        }
+
+        // 显示详细结果数据
+        function displayDetailedResults(resultDetails) {
+            try {
+                // 解析结果数据
+                const details = typeof resultDetails === 'string' ? JSON.parse(resultDetails) : resultDetails;
+                console.log('解析的详细结果数据:', details);
+
+                // 显示详细分析结果
+                let detailsHtml = '';
+
+                // 趋势分析
+                if (details.trend_analysis) {
+                    detailsHtml += `<div class="mb-3"><h6 style="color: var(--etrade-purple);"><i class="fas fa-chart-line me-2"></i>趋势分析</h6><div class="p-3 bg-light rounded">${details.trend_analysis}</div></div>`;
+                }
+
+                // 形态分析
+                if (details.pattern_analysis) {
+                    detailsHtml += `<div class="mb-3"><h6 style="color: var(--etrade-purple);"><i class="fas fa-brain me-2"></i>形态分析</h6><div class="p-3 bg-light rounded">${details.pattern_analysis}</div></div>`;
+                }
+
+                // 最终决策
+                if (details.final_decision) {
+                    const decision = details.final_decision;
+                    const decisionClass = decision.decision === '买入' ? 'alert-success' :
+                                        decision.decision === '卖出' ? 'alert-danger' : 'alert-warning';
+                    detailsHtml += `
+                        <div class="mb-3">
+                            <h6 style="color: var(--etrade-purple);"><i class="fas fa-bullseye me-2"></i>最终交易决策</h6>
+                            <div class="alert ${decisionClass}">
+                                <strong>决策:</strong> ${decision.decision || '持有'}<br>
+                                <strong>风险收益比:</strong> ${decision.risk_reward_ratio || 'N/A'}<br>
+                                <strong>预测时间:</strong> ${decision.forecast_horizon || 'N/A'}<br>
+                                <strong>理由:</strong> ${decision.justification || '暂无详细理由'}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                document.getElementById('resultDetailsContent').innerHTML = detailsHtml || '<div class="text-muted">暂无详细分析结果</div>';
+
+                // 显示技术指标
+                let indicatorsHtml = '';
+                if (details.technical_indicators) {
+                    indicatorsHtml = `<div class="p-3 bg-light rounded" style="white-space: pre-wrap;">${details.technical_indicators}</div>`;
+                }
+                document.getElementById('technicalIndicators').innerHTML = indicatorsHtml || '<div class="text-muted">暂无技术指标数据</div>';
+
+                // 显示交易建议 - 基于最终决策
+                let suggestionsHtml = '';
+                if (details.final_decision) {
+                    const decision = details.final_decision;
+                    const decisionClass = decision.decision === '买入' ? 'alert-success' :
+                                        decision.decision === '卖出' ? 'alert-danger' : 'alert-warning';
+                    suggestionsHtml = `
+                        <div class="alert ${decisionClass}">
+                            <h6><i class="fas fa-lightbulb me-2"></i>交易建议</h6>
+                            <p><strong>建议操作:</strong> ${decision.decision || '持有'}</p>
+                            <p><strong>风险收益比:</strong> ${decision.risk_reward_ratio || 'N/A'}</p>
+                            <p><strong>建议持有时间:</strong> ${decision.forecast_horizon || 'N/A'}</p>
+                            <p><strong>详细说明:</strong> ${decision.justification || '暂无详细说明'}</p>
+                        </div>
+                    `;
+                } else {
+                    suggestionsHtml = '<div class="text-muted">暂无交易建议</div>';
+                }
+                document.getElementById('tradingSuggestions').innerHTML = suggestionsHtml;
+
+            } catch (error) {
+                console.error('解析详细结果数据时出错:', error);
+                document.getElementById('resultDetailsContent').innerHTML = '<div class="alert alert-danger">解析结果数据时出错: ' + error.message + '</div>';
+                document.getElementById('technicalIndicators').innerHTML = '<div class="text-muted">数据解析失败</div>';
+                document.getElementById('tradingSuggestions').innerHTML = '<div class="text-muted">数据解析失败</div>';
+            }
+        }
+
+        // 导出结果功能
+        function exportResultDetails() {
+            // 这里可以实现结果导出功能
+            alert('导出功能正在开发中...');
+        }
+
+        // 加载历史记录数据到表格
+        function loadHistoryRecords() {
+            const historyTableBody = document.getElementById('historyTableBody');
+            historyTableBody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="text-center">
+                        <i class="fas fa-spinner fa-spin me-2"></i>加载历史记录中...
+                    </td>
+                </tr>
+            `;
+
+            // 获取筛选条件
+            const assetFilter = document.getElementById('historyAssetFilter').value;
+            const timeframeFilter = document.getElementById('historyTimeframeFilter').value;
+            const dateRangeFilter = document.getElementById('historyDateRangeFilter').value;
+
+            const filterOptions = {
+                asset: assetFilter || undefined,
+                timeframe: timeframeFilter || undefined,
+                showAll: dateRangeFilter === 'all'
+            };
+
+            getQueryHistory(filterOptions).then(records => {
+                if (records.length === 0) {
+                    historyTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">
+                                <i class="fas fa-info-circle me-2"></i>没有找到历史查询记录
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                // 生成表格行
+                let html = '';
+                records.forEach(record => {
+                    // 格式化日期时间 - 修复日期显示问题
+                    let formattedDate = '日期格式错误';
+                    try {
+                        const timestamp = new Date(record.timestamp);
+                        if (!isNaN(timestamp.getTime())) {
+                            formattedDate = timestamp.toLocaleString('zh-CN', {
+                                year: 'numeric',
+                                month: '2-digit',
+                                day: '2-digit',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            });
+                        }
+                    } catch (error) {
+                        console.warn('日期格式化错误:', error);
+                        formattedDate = record.timestamp || '未知时间';
+                    }
+
+                    // 日期范围显示 - 修复字段名问题
+                    const dateRange = `${record.start_date || '未知开始日期'} - ${record.end_date || '未知结束日期'}`;
+
+                    // 策略和图表显示
+                    const strategy = record.trading_strategy === 'high_frequency' ? '高频' : '低频';
+                    const charts = record.generate_charts ? '是' : '否';
+
+                    // 生成操作按钮 - 确保所有记录都显示"查看详情"按钮
+                    const actions = `
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-primary" onclick="reRunAnalysis(${JSON.stringify(record).replace(/"/g, '&quot;')})"><i class="fas fa-redo-alt me-1"></i>重新分析</button>
+                            <button class="btn btn-sm btn-info" onclick="showResultDetails(${record.id})"><i class="fas fa-eye me-1"></i>查看详情</button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteRecord(${record.id})"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    `;
+
+                    html += `
+                        <tr>
+                            <td>${formattedDate}</td>
+                            <td><strong>${record.asset}</strong></td>
+                            <td>${record.timeframe}</td>
+                            <td>${dateRange}</td>
+                            <td>${strategy}</td>
+                            <td>${charts}</td>
+                            <td>${actions}</td>
+                        </tr>
+                    `;
+                });
+
+                historyTableBody.innerHTML = html;
+            }).catch(error => {
+                console.error('加载历史记录失败:', error);
+                historyTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center text-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>加载历史记录失败
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // 重新运行分析
+        function reRunAnalysis(record) {
+            // 填充表单数据 - 修复字段名问题
+            document.getElementById('startDate').value = record.start_date;
+            document.getElementById('startTime').value = record.start_time || '00:00';
+            document.getElementById('endDate').value = record.end_date;
+            document.getElementById('endTime').value = record.end_time || '23:59';
+            document.getElementById('useCurrentTime').checked = record.use_current_time;
+            document.getElementById('generateCharts').checked = record.generate_charts;
+
+            // 处理当前时间选项
+            handleUseCurrentTimeChange();
+
+            // 选择资产
+            const assetButtons = document.querySelectorAll('.asset-btn');
+            let assetFound = false;
+
+            assetButtons.forEach(btn => {
+                if (btn.dataset.asset === record.asset) {
+                    btn.click();
+                    assetFound = true;
+                }
+            });
+
+            // 如果资产不在预设列表中，显示自定义资产输入
+            if (!assetFound && record.asset) {
+                showCustomAssetInput();
+                const customInput = document.getElementById('customAssetInput');
+                if (customInput) {
+                    customInput.value = record.asset;
+                }
+            }
+
+            // 选择时间周期
+            const timeframeButtons = document.querySelectorAll('.timeframe-btn[data-timeframe]');
+            timeframeButtons.forEach(btn => {
+                if (btn.dataset.timeframe === record.timeframe) {
+                    btn.click();
+                }
+            });
+
+            // 选择交易策略 - 修复字段名问题
+            const strategyButtons = document.querySelectorAll('.timeframe-btn[data-strategy]');
+            strategyButtons.forEach(btn => {
+                if (btn.dataset.strategy === record.trading_strategy) {
+                    btn.click();
+                }
+            });
+
+            // 关闭模态框
+            const modal = document.getElementById('historyModal');
+            if (modal) {
+                const bootstrapModal = bootstrap.Modal.getInstance(modal);
+                bootstrapModal.hide();
+            }
+
+            // 滚动到分析按钮
+            document.getElementById('analyzeBtn').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 删除单条记录
+        function deleteRecord(recordId) {
+            if (confirm('确定要删除这条历史记录吗？')) {
+                deleteQueryRecord(recordId).then(() => {
+                    loadHistoryRecords();
+                }).catch(error => {
+                    console.error('删除记录失败:', error);
+                    alert('删除记录失败，请重试');
+                });
+            }
+        }
+
+        // 在DOM加载完成后初始化会话ID
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化会话ID
+            initSessionId();
+        });
+
+    </script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
